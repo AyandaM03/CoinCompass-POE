@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105940441199",
+    "project_id": "budgettrackerapp-ed90e",
+    "storage_bucket": "budgettrackerapp-ed90e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105940441199:android:7bdffab2b0b51f51dc959a",
+        "android_client_info": {
+          "package_name": "com.example.opsc_code"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm-fbQBycFupUVCALn5-NeHj_GUQ_cnLw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

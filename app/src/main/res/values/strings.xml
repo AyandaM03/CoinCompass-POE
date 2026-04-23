@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OPSC_Code</string>
+    <string name="set_monthly_spending_goals">Set Monthly Spending Goals</string>
+    <string name="minimum_spending_goal">Minimum Spending Goal</string>
+    <string name="maximum_spending_goal">Maximum Spending Goal</string>
+    <string name="save_goals">Save Goals</string>
+</resources>

@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:gravity="center"
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/set_monthly_spending_goals"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="TextSizeCheck" />
+
+    <TextView
+        android:id="@+id/tvSavedGoals"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your goals will appear here"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/etMinGoal"
+        android:layout_width="313dp"
+        android:layout_height="68dp"
+        android:layout_marginBottom="16dp"
+        android:autofillHints=""
+        android:hint="@string/minimum_spending_goal"
+        android:inputType="numberDecimal"
+        android:textColorHint="#5C6BC0" />
+
+    <EditText
+        android:id="@+id/etMaxGoal"
+        android:layout_width="311dp"
+        android:layout_height="62dp"
+        android:layout_marginBottom="24dp"
+        android:autofillHints=""
+        android:hint="@string/maximum_spending_goal"
+        android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btnSaveGoals"
+        android:layout_width="313dp"
+        android:layout_height="wrap_content"
+        android:text="@string/save_goals" />
+
+</LinearLayout>
