@@ -12,7 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CoinCompass">
         <activity
-            android:name=".DashboradActivity"
+            android:name=".TransactionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SavingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AnalyticsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BudgetActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DashboardActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
