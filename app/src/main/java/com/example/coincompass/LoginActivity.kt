@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
             }else {
             //go to dashborad/home page
-                val intent = Intent(this , DashboradActivity::class.java)
+                val intent = Intent(this , DashboardActivity::class.java)
                 startActivity(intent)
                 finish()
 
