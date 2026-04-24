@@ -35,7 +35,22 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/tvCategoryBreakdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Category Breakdown"
+        android:textStyle="bold"
+        android:paddingTop="10dp"/>
 
+    <ProgressBar
+        android:id="@+id/progressBarBudget"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:max="100"
+        android:progress="0"
+        android:layout_marginTop="10dp"/>
     <!-- RecyclerView for expenses -->
 
     <!-- Empty state -->

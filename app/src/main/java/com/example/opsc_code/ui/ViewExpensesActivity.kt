@@ -38,12 +38,16 @@ class ViewExpensesActivity : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var adapter: ExpenseAdapter
 
+    private lateinit var progressBarBudget: ProgressBar
+
+    private lateinit var tvCategoryBreakdown: TextView
     private val expenses = mutableListOf<Expense>()
     private val categories = mutableMapOf<String, Category>()
     private var minGoal = 0.0
     private var maxGoal = 0.0
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+    private var selectedMonth: String = ""
     companion object {
         private const val COLLECTION_EXPENSES = "expenses"
         private const val COLLECTION_CATEGORIES = "categories"
@@ -59,18 +63,23 @@ class ViewExpensesActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
+        val sdf = SimpleDateFormat("yyyy-MM", Locale.getDefault())
+        selectedMonth = sdf.format(java.util.Date())
+
         // Check if user is logged in
         if (auth.currentUser == null) {
             Toast.makeText(this, "Please log in first", Toast.LENGTH_LONG).show()
             finish()
             return
+
         }
 
         initializeViews()
         setupRecyclerView()
         setupButtons()
-        loadCategoriesAndExpenses()
         loadGoals()
+        loadCategoriesAndExpenses()
+
     }
 
     private fun initializeViews() {
@@ -81,6 +90,8 @@ class ViewExpensesActivity : AppCompatActivity() {
         tvGoalStatus = findViewById(R.id.tvGoalStatus)
         btnBackToDashboard = findViewById(R.id.btnBackToDashboard)
         btnAddExpense = findViewById(R.id.btnAddExpense)
+        progressBarBudget = findViewById(R.id.progressBarBudget)
+        tvCategoryBreakdown = findViewById(R.id.tvCategoryBreakdown)
     }
 
     private fun setupRecyclerView() {
@@ -99,22 +110,13 @@ class ViewExpensesActivity : AppCompatActivity() {
         }
     }
     private fun loadGoals() {
-        val userId = auth.currentUser?.uid ?: return
+        val prefs = getSharedPreferences("GoalsPrefs", MODE_PRIVATE)
 
-        firestore.collection(COLLECTION_GOALS)
-            .document(userId)
-            .get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    minGoal = doc.getDouble("minGoal") ?: 0.0
-                    maxGoal = doc.getDouble("maxGoal") ?: 0.0
-                }
-                loadCategoriesAndExpenses()
-            }
-            .addOnFailureListener {
-                loadCategoriesAndExpenses()
-            }
+        minGoal = prefs.getFloat("minGoal", 0f).toDouble()
+        maxGoal = prefs.getFloat("maxGoal", 0f).toDouble()
     }
+
+
     private fun loadCategoriesAndExpenses() {
         showLoading(true)
         val currentUser = auth.currentUser ?: return
@@ -146,14 +148,24 @@ class ViewExpensesActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { querySnapshot ->
                 expenses.clear()
+                expenses.clear()
+
                 querySnapshot.documents.forEach { document ->
                     val expense = Expense.fromMap(document.id, document.data)
-                    expenses.add(expense)
+
+                    val expenseMonth = expense.date?.let {
+                        SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(it)
+                    }
+
+                    if (expenseMonth == selectedMonth) {
+                        expenses.add(expense)
+                    }
                 }
                 // Sort by date descending (newest first) locally
                 expenses.sortByDescending { it.date }
                 adapter.notifyDataSetChanged()
                 updateTotalAndGoals()
+                updateCategoryBreakdown()
                 showEmptyState(expenses.isEmpty())
                 showLoading(false)
             }
@@ -163,26 +175,51 @@ class ViewExpensesActivity : AppCompatActivity() {
             }
     }
 
-    private fun updateTotalAmount() {
-        val total = expenses.sumOf { it.amount }
-        tvTotalAmount.text = String.format("Total: R%.2f", total)
-    }
     private fun updateTotalAndGoals() {
         val total = expenses.sumOf { it.amount }
         tvTotalAmount.text = String.format("Total: R%.2f", total)
 
         if (minGoal == 0.0 && maxGoal == 0.0) {
             tvGoalStatus.text = "No goals set"
+            progressBarBudget.progress = 0
             return
         }
 
+        // Calculate percentage usage
+        val percentage = if (maxGoal > 0) {
+            ((total / maxGoal) * 100).toInt()
+        } else {
+            0
+        }
+
+        progressBarBudget.progress = percentage.coerceAtMost(100)
+
         tvGoalStatus.text = when {
-            total < minGoal -> "Below minimum goal"
-            total > maxGoal -> "Exceeded maximum goal"
-            else -> "Within budget"
+            total < minGoal -> "Below minimum goal (${percentage}%)"
+            total > maxGoal -> "Exceeded maximum goal (${percentage}%)"
+            else -> "Within budget (${percentage}%)"
         }
     }
 
+    private fun updateCategoryBreakdown() {
+        val categoryTotals = mutableMapOf<String, Double>()
+
+        for (expense in expenses) {
+            val categoryName = categories[expense.categoryId]?.name ?: "Unknown"
+
+            categoryTotals[categoryName] =
+                categoryTotals.getOrDefault(categoryName, 0.0) + expense.amount
+        }
+
+        val builder = StringBuilder()
+        builder.append("Category Breakdown:\n")
+
+        for ((category, total) in categoryTotals) {
+            builder.append("$category: R%.2f\n".format(total))
+        }
+
+        tvCategoryBreakdown.text = builder.toString()
+    }
     private fun showEmptyState(show: Boolean) {
         tvEmptyState.visibility = if (show) View.VISIBLE else View.GONE
         recyclerView.visibility = if (show) View.GONE else View.VISIBLE
@@ -194,12 +231,11 @@ class ViewExpensesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh data when returning to this activity
         if (auth.currentUser != null) {
+            loadGoals()
             loadCategoriesAndExpenses()
         }
     }
-
     /**
      * RecyclerView Adapter for expenses.
      */

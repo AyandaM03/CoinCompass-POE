@@ -3,8 +3,8 @@ package com.example.opsc_code
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+
+
 
 class GoalsActivity : AppCompatActivity() {
 
@@ -13,15 +13,11 @@ class GoalsActivity : AppCompatActivity() {
     private lateinit var btnSaveGoals: Button
     private lateinit var tvSavedGoals: TextView
 
-    private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_goals)
 
-        auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()
 
         etMinGoal = findViewById(R.id.etMinGoal)
         etMaxGoal = findViewById(R.id.etMaxGoal)
@@ -35,10 +31,7 @@ class GoalsActivity : AppCompatActivity() {
         }
     }
 
-
     private fun saveGoals() {
-        val userId = auth.currentUser?.uid ?: return
-
         val minText = etMinGoal.text.toString().trim()
         val maxText = etMaxGoal.text.toString().trim()
 
@@ -47,51 +40,43 @@ class GoalsActivity : AppCompatActivity() {
             return
         }
 
-        val minGoal = minText.toDoubleOrNull()
-        val maxGoal = maxText.toDoubleOrNull()
+        val minGoal = minText.toFloatOrNull()
+        val maxGoal = maxText.toFloatOrNull()
 
         if (minGoal == null || maxGoal == null) {
             Toast.makeText(this, "Invalid numbers", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val goalMap = hashMapOf(
-            "userId" to userId,
-            "minGoal" to minGoal,
-            "maxGoal" to maxGoal
-        )
+        if (minGoal > maxGoal) {
+            Toast.makeText(this, "Min cannot be greater than Max", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        firestore.collection("goals")
-            .document(userId)
-            .set(goalMap)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Goals saved", Toast.LENGTH_SHORT).show()
+        // SAVE LOCALLY (SharedPreferences)
+        val prefs = getSharedPreferences("GoalsPrefs", MODE_PRIVATE)
+        val editor = prefs.edit()
 
+        editor.putFloat("minGoal", minGoal)
+        editor.putFloat("maxGoal", maxGoal)
+        editor.apply()
 
-                tvSavedGoals.text = "Min: R$minGoal | Max: R$maxGoal"
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to save goals", Toast.LENGTH_SHORT).show()
-            }
+        Toast.makeText(this, "Goals saved locally", Toast.LENGTH_SHORT).show()
+
+        tvSavedGoals.text = "Min: R$minGoal | Max: R$maxGoal"
     }
-
 
     private fun loadGoals() {
-        val userId = auth.currentUser?.uid ?: return
+        val prefs = getSharedPreferences("GoalsPrefs", MODE_PRIVATE)
 
-        firestore.collection("goals")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    val min = doc.getDouble("minGoal") ?: 0.0
-                    val max = doc.getDouble("maxGoal") ?: 0.0
+        val min = prefs.getFloat("minGoal", 0f)
+        val max = prefs.getFloat("maxGoal", 0f)
 
-                    etMinGoal.setText(min.toString())
-                    etMaxGoal.setText(max.toString())
+        if (min != 0f || max != 0f) {
+            etMinGoal.setText(min.toString())
+            etMaxGoal.setText(max.toString())
 
-                    tvSavedGoals.text = "Min: R$min | Max: R$max"
-                }
-            }
+            tvSavedGoals.text = "Min: R$min | Max: R$max"
+        }
     }
-}
+    }

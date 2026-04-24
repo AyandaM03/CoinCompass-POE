@@ -6,26 +6,25 @@
     android:padding="24dp">
 
     <TextView
-        android:gravity="center"
-        android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="@string/set_monthly_spending_goals"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:ignore="TextSizeCheck" />
+        android:layout_width="600dp"
+        android:layout_height="58dp"
+        android:background="#1E2E83"
+        android:text="Set monthly spending goals"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvSavedGoals"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Your goals will appear here"
-        android:textSize="16sp"
-        android:layout_marginTop="16dp"/>
+        android:textSize="16sp" />
 
     <EditText
         android:id="@+id/etMinGoal"
-        android:layout_width="313dp"
+        android:layout_width="374dp"
         android:layout_height="68dp"
         android:layout_marginBottom="16dp"
         android:autofillHints=""
@@ -35,7 +34,7 @@
 
     <EditText
         android:id="@+id/etMaxGoal"
-        android:layout_width="311dp"
+        android:layout_width="373dp"
         android:layout_height="62dp"
         android:layout_marginBottom="24dp"
         android:autofillHints=""
@@ -44,7 +43,7 @@
 
     <Button
         android:id="@+id/btnSaveGoals"
-        android:layout_width="313dp"
+        android:layout_width="366dp"
         android:layout_height="wrap_content"
         android:text="@string/save_goals" />
 
